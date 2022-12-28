@@ -1,0 +1,292 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="AudioRecorder_PlayerSample.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:syncfusion="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+    x:Name="mainPage"
+    NavigationPage.HasNavigationBar="False">
+
+    <Grid
+        Margin="16"
+        RowDefinitions="auto,*,auto,auto"
+        RowSpacing="8">
+
+        <!--  Audios heading label  -->
+        <Label
+            Grid.Row="0"
+            FontAttributes="Bold"
+            FontSize="16"
+            Text="Audios List"
+            TextColor="Black" />
+
+        <!--  Audio Grid  -->
+        <Frame
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            Padding="5"
+            BackgroundColor="White"
+            BorderColor="#E7EBF6"
+            HasShadow="True"
+            IsVisible="True">
+            <Grid>
+                <syncfusion:SfListView
+                    x:Name="AudioList"
+                    Grid.Row="0"
+                    Grid.ColumnSpan="2"
+                    Margin="0,8"
+                    IsVisible="true"
+                    ItemsSource="{Binding Audios}"
+                    SelectionMode="None">
+                    <syncfusion:SfListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid
+                                x:Name="PlayAudioGrid"
+                                Margin="0,4,0,12"
+                                BackgroundColor="Transparent"
+                                HeightRequest="60">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="50" />
+                                    <ColumnDefinition Width="80" />
+                                </Grid.ColumnDefinitions>
+
+                                <Button
+                                    Grid.Column="0"
+                                    Padding="0"
+                                    BackgroundColor="Transparent"
+                                    Command="{Binding Path=BindingContext.PlayAudioCommand, Source={x:Reference mainPage}}"
+                                    CommandParameter="{Binding .}"
+                                    FontFamily="AudioIconFonts"
+                                    FontSize="22"
+                                    IsVisible="{Binding IsPlayVisible}"
+                                    Text="&#xea15;"
+                                    TextColor="Black" />
+                                <Button
+                                    Grid.Column="0"
+                                    Padding="0"
+                                    BackgroundColor="Transparent"
+                                    BorderColor="LightGray"
+                                    Command="{Binding Path=BindingContext.PauseAudioCommand, Source={x:Reference mainPage}}"
+                                    CommandParameter="{Binding .}"
+                                    FontFamily="AudioIconFonts"
+                                    FontSize="22"
+                                    IsVisible="{Binding IsPauseVisble}"
+                                    Text="&#xea16;"
+                                    TextColor="Black" />
+                                <Label
+                                    Grid.Column="1"
+                                    FontSize="14"
+                                    Text="{Binding AudioName}"
+                                    TextColor="Black"
+                                    VerticalTextAlignment="Center" />
+                                <Label
+                                    Grid.Column="2"
+                                    Margin="4,0,12,0"
+                                    FontSize="14"
+                                    IsVisible="{Binding IsPauseVisble}"
+                                    Text="{Binding CurrentAudioPosition}"
+                                    TextColor="Black"
+                                    VerticalTextAlignment="Center" />
+                                <Button
+                                    Grid.Column="3"
+                                    BackgroundColor="Transparent"
+                                    Command="{Binding Path=BindingContext.DeleteCommand, Source={x:Reference mainPage}}"
+                                    CommandParameter="{Binding}"
+                                    FontFamily="AudioIconFonts"
+                                    FontSize="20"
+                                    Text="&#xe9ac;"
+                                    TextColor="Red" />
+                            </Grid>
+                        </DataTemplate>
+                    </syncfusion:SfListView.ItemTemplate>
+                </syncfusion:SfListView>
+                <Label
+                    x:Name="emptyMessage"
+                    Grid.Row="0"
+                    Grid.ColumnSpan="2"
+                    HorizontalTextAlignment="Center"
+                    IsVisible="False"
+                    Text="No audio files are available."
+                    TextColor="Black"
+                    VerticalOptions="Center"
+                    VerticalTextAlignment="Center">
+                    <Label.Triggers>
+                        <DataTrigger
+                            Binding="{Binding Audios.Count, Mode=TwoWay}"
+                            TargetType="Label"
+                            Value="0">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </Grid>
+        </Frame>
+
+        <!--  Timer Label  -->
+        <StackLayout
+            Grid.Row="2"
+            Grid.ColumnSpan="2"
+            Margin="0,0,0,32"
+            VerticalOptions="End">
+            <Label
+                FontSize="14"
+                HorizontalTextAlignment="Center"
+                IsVisible="{Binding IsRecordingAudio}"
+                Text="Recording…"
+                TextColor="#7D898F" />
+            <Label
+                FontSize="60"
+                HorizontalTextAlignment="Center"
+                IsVisible="{Binding IsRecordingAudio}"
+                Text="{Binding TimerLabel}"
+                TextColor="Black" />
+        </StackLayout>
+
+        <!--  Button Setup  -->
+        <Grid
+            Grid.Row="3"
+            Grid.ColumnSpan="2"
+            ColumnSpacing="60">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Retry  -->
+            <Grid Grid.Column="0" RowDefinitions="auto,auto">
+                <Button
+                    Grid.Row="0"
+                    BackgroundColor="LightGray"
+                    BorderColor="#5F49FF"
+                    BorderWidth="1"
+                    Command="{Binding ResetCommand}"
+                    CornerRadius="25"
+                    FontFamily="AudioIconFonts"
+                    FontSize="22"
+                    HeightRequest="50"
+                    IsEnabled="{Binding IsRecordingAudio}"
+                    Text="&#xe900;"
+                    TextColor="#5F49FF"
+                    WidthRequest="50">
+                    <Button.Triggers>
+                        <DataTrigger
+                            Binding="{Binding IsRecordingAudio}"
+                            TargetType="Button"
+                            Value="False">
+                            <Setter Property="TextColor" Value="Gray" />
+                            <Setter Property="BorderColor" Value="Gray" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Label
+                    Grid.Row="1"
+                    HorizontalOptions="Center"
+                    Text="Retry" />
+            </Grid>
+
+            <!--  Play  -->
+            <Grid
+                Grid.Column="1"
+                HorizontalOptions="CenterAndExpand"
+                RowDefinitions="auto,auto">
+                <!--  Record Button  -->
+                <Button
+                    Grid.Row="0"
+                    BackgroundColor="Red"
+                    BorderColor="Red"
+                    BorderWidth="1"
+                    Command="{Binding RecordCommand}"
+                    CornerRadius="25"
+                    FontFamily="AudioIconFonts"
+                    FontSize="22"
+                    HeightRequest="50"
+                    IsVisible="{Binding IsRecordButtonVisible}"
+                    Text="&#xe91e;"
+                    TextColor="White"
+                    WidthRequest="50" />
+                <Label
+                    Grid.Row="1"
+                    HorizontalOptions="Center"
+                    IsVisible="{Binding IsRecordButtonVisible}"
+                    Text="Record" />
+
+                <!--  Pause Button  -->
+                <Button
+                    Grid.Row="0"
+                    BackgroundColor="Green"
+                    BorderColor="Green"
+                    BorderWidth="1"
+                    Command="{Binding PauseCommand}"
+                    CornerRadius="25"
+                    FontFamily="AudioIconFonts"
+                    FontSize="22"
+                    HeightRequest="50"
+                    IsVisible="{Binding IsPauseButtonVisible}"
+                    Text="&#xea1d;"
+                    TextColor="White"
+                    WidthRequest="50" />
+                <Label
+                    Grid.Row="1"
+                    HorizontalOptions="Center"
+                    IsVisible="{Binding IsPauseButtonVisible}"
+                    Text="Pause" />
+
+                <!--  Resume Button  -->
+                <Button
+                    Grid.Row="0"
+                    BackgroundColor="Red"
+                    BorderColor="Red"
+                    BorderWidth="1"
+                    Command="{Binding RecordCommand}"
+                    CornerRadius="25"
+                    FontFamily="AudioIconFonts"
+                    FontSize="22"
+                    HeightRequest="50"
+                    IsVisible="{Binding IsResumeButtonVisible}"
+                    Text="&#xea1c;"
+                    TextColor="White"
+                    WidthRequest="50" />
+                <Label
+                    Grid.Row="1"
+                    HorizontalOptions="Center"
+                    IsVisible="{Binding IsResumeButtonVisible}"
+                    Text="Resume" />
+            </Grid>
+
+            <!--  Stop  -->
+            <Grid Grid.Column="2" RowDefinitions="auto,auto">
+                <Button
+                    Grid.Row="0"
+                    BackgroundColor="LightGray"
+                    BorderColor="#5F49FF"
+                    BorderWidth="1"
+                    Command="{Binding StopCommand}"
+                    CornerRadius="25"
+                    FontFamily="AudioIconFonts"
+                    FontSize="22"
+                    HeightRequest="50"
+                    IsEnabled="{Binding IsRecordingAudio}"
+                    Text="&#xea1e;"
+                    TextColor="#5F49FF"
+                    WidthRequest="50">
+                    <Button.Triggers>
+                        <DataTrigger
+                            Binding="{Binding IsRecordingAudio}"
+                            TargetType="Button"
+                            Value="False">
+                            <Setter Property="TextColor" Value="Gray" />
+                            <Setter Property="BorderColor" Value="Gray" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Label
+                    Grid.Row="1"
+                    HorizontalOptions="Center"
+                    Text="Stop" />
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,11 @@
+﻿namespace AudioRecorder_PlayerSample;
+
+public partial class App : Application
+{
+	public App(AppShell appShell)
+	{
+		InitializeComponent();
+
+		MainPage = appShell;
+	}
+}
